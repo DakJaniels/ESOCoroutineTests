@@ -1,0 +1,155 @@
+[12:24:53:465] [TEST1] Basic traceback:
+[12:24:53:466] stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:763: in function 'TestCoroutine.tests.TestTracebackCursedBehavior'
+<Locals> makeError = user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:754, co = , success = F, err = "user:/AddOns/eso_coroutine_tes..." </Locals>
+[string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:1: in function '(main chunk)'
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:10: in function 'fn'
+<Locals> txt = "TestCoroutine.tests.TestTraceb...", f = [string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:0 </Locals>
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:347: in function 'DoCommand'
+<Locals> text = "/script TestCoroutine.tests.Te...", command = "/script", arguments = "TestCoroutine.tests.TestTraceb...", fn = EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:8 </Locals>
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:1695: in function 'SharedChatSystem:SubmitTextEntry'
+<Locals> self = [table:1]{isAgentChatActive = F, currentChannel = 0, loaded = T, isMinimizingOrMaximizing = F, currentNumNotifications = 0, lastValidChannel = 15, numUnreadMails = 0, shouldMinimizeAfterEntry = F, ignoreTextEntryChangedEvent = F, maxContainerHeight = 1026, suppressSave = F, maxContainerWidth = 1824, allowMultipleContainers = F, minContainerWidth = 300, isMinimized = F, minContainerHeight = 170}, text = "/script TestCoroutine.tests.Te...", valid = F, prefix = 47 </Locals>
+(tail call): ?
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:2434: in function 'ZO_ChatTextEntry_Execute'
+<Locals> control = ud </Locals>
+ZO_ChatWindowTextEntryEditBox_Enter:3: in function '(main chunk)'
+<Locals> self = ud </Locals>
+(tail call): ?
+(tail call): ?
+[12:24:53:469] [TEST2] Number as message:
+[12:24:53:471] 42
+stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:769: in function 'TestCoroutine.tests.TestTracebackCursedBehavior'
+<Locals> makeError = user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:754, co = , success = F, err = "user:/AddOns/eso_coroutine_tes...", trace1 = "stack traceback: user:/AddOns/..." </Locals>
+[string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:1: in function '(main chunk)'
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:10: in function 'fn'
+<Locals> txt = "TestCoroutine.tests.TestTraceb...", f = [string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:0 </Locals>
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:347: in function 'DoCommand'
+<Locals> text = "/script TestCoroutine.tests.Te...", command = "/script", arguments = "TestCoroutine.tests.TestTraceb...", fn = EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:8 </Locals>
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:1695: in function 'SharedChatSystem:SubmitTextEntry'
+<Locals> self = [table:1]{isAgentChatActive = F, currentChannel = 0, loaded = T, isMinimizingOrMaximizing = F, currentNumNotifications = 0, lastValidChannel = 15, numUnreadMails = 0, shouldMinimizeAfterEntry = F, ignoreTextEntryChangedEvent = F, maxContainerHeight = 1026, suppressSave = F, maxContainerWidth = 1824, allowMultipleContainers = F, minContainerWidth = 300, isMinimized = F, minContainerHeight = 170}, text = "/script TestCoroutine.tests.Te...", valid = F, prefix = 47 </Locals>
+(tail call): ?
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:2434: in function 'ZO_ChatTextEntry_Execute'
+<Locals> control = ud </Locals>
+ZO_ChatWindowTextEntryEditBox_Enter:3: in function '(main chunk)'
+<Locals> self = ud </Locals>
+(tail call): ?
+(tail call): ?
+[12:24:53:473] [TEST3] Nil + level:
+[12:24:53:475] stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:775: in function 'TestCoroutine.tests.TestTracebackCursedBehavior'
+<Locals> makeError = user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:754, co = , success = F, err = "user:/AddOns/eso_coroutine_tes...", trace1 = "stack traceback: user:/AddOns/...", trace2 = "42 stack traceback: user:/AddO..." </Locals>
+[string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:1: in function '(main chunk)'
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:10: in function 'fn'
+<Locals> txt = "TestCoroutine.tests.TestTraceb...", f = [string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:0 </Locals>
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:347: in function 'DoCommand'
+<Locals> text = "/script TestCoroutine.tests.Te...", command = "/script", arguments = "TestCoroutine.tests.TestTraceb...", fn = EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:8 </Locals>
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:1695: in function 'SharedChatSystem:SubmitTextEntry'
+<Locals> self = [table:1]{isAgentChatActive = F, currentChannel = 0, loaded = T, isMinimizingOrMaximizing = F, currentNumNotifications = 0, lastValidChannel = 15, numUnreadMails = 0, shouldMinimizeAfterEntry = F, ignoreTextEntryChangedEvent = F, maxContainerHeight = 1026, suppressSave = F, maxContainerWidth = 1824, allowMultipleContainers = F, minContainerWidth = 300, isMinimized = F, minContainerHeight = 170}, text = "/script TestCoroutine.tests.Te...", valid = F, prefix = 47 </Locals>
+(tail call): ?
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:2434: in function 'ZO_ChatTextEntry_Execute'
+<Locals> control = ud </Locals>
+ZO_ChatWindowTextEntryEditBox_Enter:3: in function '(main chunk)'
+<Locals> self = ud </Locals>
+(tail call): ?
+(tail call): ?
+[12:24:53:477] Type:
+[12:24:53:478] string
+[12:24:53:480] [TEST4] Empty string + level:
+[12:24:53:481] 
+stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:781: in function 'TestCoroutine.tests.TestTracebackCursedBehavior'
+<Locals> makeError = user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:754, co = , success = F, err = "user:/AddOns/eso_coroutine_tes...", trace1 = "stack traceback: user:/AddOns/...", trace2 = "42 stack traceback: user:/AddO...", trace3 = "stack traceback: user:/AddOns/..." </Locals>
+[string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:1: in function '(main chunk)'
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:10: in function 'fn'
+<Locals> txt = "TestCoroutine.tests.TestTraceb...", f = [string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:0 </Locals>
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:347: in function 'DoCommand'
+<Locals> text = "/script TestCoroutine.tests.Te...", command = "/script", arguments = "TestCoroutine.tests.TestTraceb...", fn = EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:8 </Locals>
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:1695: in function 'SharedChatSystem:SubmitTextEntry'
+<Locals> self = [table:1]{isAgentChatActive = F, currentChannel = 0, loaded = T, isMinimizingOrMaximizing = F, currentNumNotifications = 0, lastValidChannel = 15, numUnreadMails = 0, shouldMinimizeAfterEntry = F, ignoreTextEntryChangedEvent = F, maxContainerHeight = 1026, suppressSave = F, maxContainerWidth = 1824, allowMultipleContainers = F, minContainerWidth = 300, isMinimized = F, minContainerHeight = 170}, text = "/script TestCoroutine.tests.Te...", valid = F, prefix = 47 </Locals>
+(tail call): ?
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:2434: in function 'ZO_ChatTextEntry_Execute'
+<Locals> control = ud </Locals>
+ZO_ChatWindowTextEntryEditBox_Enter:3: in function '(main chunk)'
+<Locals> self = ud </Locals>
+(tail call): ?
+(tail call): ?
+[12:24:53:483] [TEST5] Double nil + level:
+[12:24:53:484] stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:787: in function 'TestCoroutine.tests.TestTracebackCursedBehavior'
+<Locals> makeError = user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:754, co = , success = F, err = "user:/AddOns/eso_coroutine_tes...", trace1 = "stack traceback: user:/AddOns/...", trace2 = "42 stack traceback: user:/AddO...", trace3 = "stack traceback: user:/AddOns/...", trace4 = " stack traceback: user:/AddOns..." </Locals>
+[string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:1: in function '(main chunk)'
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:10: in function 'fn'
+<Locals> txt = "TestCoroutine.tests.TestTraceb...", f = [string "TestCoroutine.tests.TestTracebackCursedBehavior()"]:0 </Locals>
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:347: in function 'DoCommand'
+<Locals> text = "/script TestCoroutine.tests.Te...", command = "/script", arguments = "TestCoroutine.tests.TestTraceb...", fn = EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:8 </Locals>
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:1695: in function 'SharedChatSystem:SubmitTextEntry'
+<Locals> self = [table:1]{isAgentChatActive = F, currentChannel = 0, loaded = T, isMinimizingOrMaximizing = F, currentNumNotifications = 0, lastValidChannel = 15, numUnreadMails = 0, shouldMinimizeAfterEntry = F, ignoreTextEntryChangedEvent = F, maxContainerHeight = 1026, suppressSave = F, maxContainerWidth = 1824, allowMultipleContainers = F, minContainerWidth = 300, isMinimized = F, minContainerHeight = 170}, text = "/script TestCoroutine.tests.Te...", valid = F, prefix = 47 </Locals>
+(tail call): ?
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:2434: in function 'ZO_ChatTextEntry_Execute'
+<Locals> control = ud </Locals>
+ZO_ChatWindowTextEntryEditBox_Enter:3: in function '(main chunk)'
+<Locals> self = ud </Locals>
+(tail call): ?
+(tail call): ?
+[12:24:53:486] Type:
+[12:24:53:488] string
+[12:24:53:489] Test Failed: The cursed behavior returns the last argument!
+Expected: number
+Actual: string
+[12:24:53:490] [TEST6] Thread + nil + level (correct usage):
+[12:24:53:492] stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:756: in function 'makeError'
+<Locals> self = ud </Locals>
+[12:24:53:493] [TEST7] Just thread:
+[12:24:53:494] stack traceback:
+[C]: in function 'error'
+<Locals> control = ud </Locals>
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:756: in function 'makeError'
+<Locals> self = ud </Locals>
+[12:27:20:338] [@Ozzfreak] has logged off with [Ozzfreak].
+[12:29:52:860] [COMPARE] Regular vs Thread traceback:
+[12:29:52:862] Regular:
+[12:29:52:863] user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:708: boom
+stack traceback:
+[C]: in function 'error'
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:708: in function 'deeperFunction'
+<Locals> x = 43 </Locals>
+(tail call): ?
+(tail call): ?
+stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:727: in function 'TestCoroutine.tests.TestCoroutineTracebackMethods'
+<Locals> deeperFunction = user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:707, middleFunction = user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:711, co = , success = F, err = "user:/AddOns/eso_coroutine_tes..." </Locals>
+[string "TestCoroutine.tests.TestCoroutineTracebackMethods()"]:1: in function '(main chunk)'
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:10: in function 'fn'
+<Locals> txt = "TestCoroutine.tests.TestCorout...", f = [string "TestCoroutine.tests.TestCoroutineTracebackMethods()"]:0 </Locals>
+EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:347: in function 'DoCommand'
+<Locals> text = "/script TestCoroutine.tests.Te...", command = "/script", arguments = "TestCoroutine.tests.TestCorout...", fn = EsoUI/Ingame/SlashCommands/SlashCommands_Shared.lua:8 </Locals>
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:1695: in function 'SharedChatSystem:SubmitTextEntry'
+<Locals> self = [table:1]{isAgentChatActive = F, currentChannel = 0, loaded = T, isMinimizingOrMaximizing = F, currentNumNotifications = 0, lastValidChannel = 15, numUnreadMails = 0, shouldMinimizeAfterEntry = F, ignoreTextEntryChangedEvent = F, maxContainerHeight = 1026, suppressSave = F, maxContainerWidth = 1824, allowMultipleContainers = F, minContainerWidth = 300, isMinimized = F, minContainerHeight = 170}, text = "/script TestCoroutine.tests.Te...", valid = F, prefix = 47 </Locals>
+(tail call): ?
+EsoUI/Ingame/ChatSystem/SharedChatSystem.lua:2434: in function 'ZO_ChatTextEntry_Execute'
+<Locals> control = ud </Locals>
+ZO_ChatWindowTextEntryEditBox_Enter:3: in function '(main chunk)'
+<Locals> self = ud </Locals>
+(tail call): ?
+(tail call): ?
+[12:29:52:865] Thread:
+[12:29:52:866] user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:708: boom
+stack traceback:
+[C]: in function 'error'
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:708: in function 'deeperFunction'
+<Locals> x = 43 </Locals>
+(tail call): ?
+(tail call): ?
+stack traceback:
+user:/AddOns/eso_coroutine_tests/eso_coroutine_tests.lua:708: in function 'deeperFunction'
+<Locals> self = ud </Locals>
+(tail call): ?
+(tail call): ?
+[12:29:52:868] Test Failed: Regular trace should show local variable
+Expected: true
+Actual: false
+[12:29:52:869] Test Failed: Thread trace should show local variable
+Expected: true
+Actual: false
