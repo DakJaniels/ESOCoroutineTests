@@ -2,7 +2,7 @@
 ## Description: Test suite for ESO's coroutine implementation
 ## Author: TARS
 ## Version: 1.0.0
-## APIVersion: 101040
+## APIVersion: 101045
 ## SavedVariables: 
 ## DependsOn: 
 
