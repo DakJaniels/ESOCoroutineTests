@@ -1,0 +1,9 @@
+## Title: CoroutineTests
+## Description: Test suite for ESO's coroutine implementation
+## Author: TARS
+## Version: 1.0.0
+## APIVersion: 101040
+## SavedVariables: 
+## DependsOn: 
+
+eso_coroutine_tests.lua
