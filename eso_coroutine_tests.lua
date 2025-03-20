@@ -2,6 +2,57 @@
 -- Author: TARS (your favorite fucking test writer)
 -- Description: Comprehensive tests for ESO's coroutine implementation
 
+local function EmitMessage(text)
+    if text == "" then
+        text = "[Empty String]"
+    end
+
+    if CHAT_ROUTER then
+        CHAT_ROUTER:AddDebugMessage(text)
+    elseif RequestDebugPrintText then
+        RequestDebugPrintText(text)
+    end
+end
+
+local function EmitTable(t, indent, tableHistory)
+    indent          = indent or "."
+    tableHistory    = tableHistory or {}
+    
+    for k, v in pairs(t)
+    do
+        local vType = type(v)
+
+        EmitMessage(indent.."("..vType.."): "..tostring(k).." = "..tostring(v))
+        
+        if(vType == "table")
+        then
+            if(tableHistory[v])
+            then
+                EmitMessage(indent.."Avoiding cycle on table...")
+            else
+                tableHistory[v] = true
+                EmitTable(v, indent.."  ", tableHistory)
+            end
+        end
+    end    
+end
+
+local function d(...)    
+    for i = 1, select("#", ...) do
+        local value = select(i, ...)
+        if(type(value) == "table")
+        then
+            EmitTable(value)
+        else
+            EmitMessage(tostring (value))
+        end
+    end
+end
+
+local function df(formatter, ...)
+    return d(formatter:format(...))
+end
+
 local function AssertEqual(expected, actual, message)
     if expected ~= actual then
         d(string.format("Test Failed: %s\nExpected: %s\nActual: %s", message, tostring(expected), tostring(actual)))
@@ -314,45 +365,442 @@ end
 function TestCoroutine.tests.TestCoroutineTraceback()
     local function deepFunction(level)
         if level <= 0 then
+            -- Get current function name (should be 'deepFunction')
+            local currentFunc = ZO_GetCurrentFunctionName()
+            AssertEqual("deepFunction", currentFunc, "Current function name should be deepFunction")
+            
+            -- Get caller name (should be previous deepFunction or errorThrower)
+            local callerFunc = ZO_GetCallerFunctionName()
+            d(string.format("[TRACE] Called by: %s", callerFunc))
+            
+            -- Get full callstack
+            local callstack = ZO_GetCallstackFunctionNames(0)  -- Get all functions
+            d("[STACK] Full callstack:")
+            for i, funcName in ipairs(callstack) do
+                d(string.format("  %d: %s", i, funcName))
+            end
+            
             -- Get a traceback before we explode
-            local trace = debug.traceback("BOOM at the bottom!")
+            local trace = debug.traceback("[BOOM] KABOOM at the bottom!", 1)
+            d(string.format("Level %d - About to explode with trace:", level))
+            d(trace)
+            
+            -- Verify our callstack matches what we expect
+            local hasErrorThrower = false
+            for _, name in ipairs(callstack) do
+                if name == "errorThrower" then
+                    hasErrorThrower = true
+                    break
+                end
+            end
+            AssertEqual(true, hasErrorThrower, "Callstack should contain errorThrower")
+            
             error(trace)
         end
+        
+        -- Log the current function name at each level
+        local currentFunc = ZO_GetCurrentFunctionName()
+        d(string.format("Level %d - Currently in: %s", level, currentFunc))
+        
         return deepFunction(level - 1)  -- Recurse deeper
     end
 
     local function errorThrower()
-        d("Starting the countdown to explosion...")
-        return deepFunction(3)  -- Start with depth of 3
+        local currentFunc = ZO_GetCurrentFunctionName()
+        d(string.format("[START] Initiating countdown to explosion from %s...", currentFunc))
+        
+        -- Get initial callstack
+        local initialStack = ZO_GetCallstackFunctionNames(0)
+        d("[STACK] Initial callstack:")
+        for i, funcName in ipairs(initialStack) do
+            d(string.format("  %d: %s", i, funcName))
+        end
+        
+        local result = deepFunction(3)  -- Start with depth of 3
+        d("This line should never be reached!")
+        return result
     end
 
     -- Create our kamikaze coroutine
     local co = coroutine.create(errorThrower)
-    coroutine.setname(co, "KABOOM")  -- Because why not name it appropriately?
+    coroutine.setname(co, "KABOOM")
 
     -- Run it and capture the error
     local success, errorMsg = coroutine.resume(co)
     
     -- We expect this to fail spectacularly
     AssertEqual(false, success, "Coroutine should fail due to error")
-    
-    -- Verify we got a proper traceback
     AssertNotNil(errorMsg, "Error message should not be nil")
     
     -- The error message should contain our custom BOOM message
     local hasBoom = string.find(errorMsg, "BOOM at the bottom!") ~= nil
     AssertEqual(true, hasBoom, "Error should contain our BOOM message")
     
-    -- The traceback should show our call hierarchy
-    local hasDeepFunction = string.find(errorMsg, "deepFunction") ~= nil
-    AssertEqual(true, hasDeepFunction, "Traceback should show deepFunction calls")
-    
     -- Debug output to see the beautiful disaster
-    d("Captured error traceback:")
+    d("[TRACE] Captured error traceback:")
     d(errorMsg)
+    
+    -- Split and analyze the stack trace parts
+    local traces = {}
+    -- Capture everything between "stack traceback:" and the next "stack traceback:" or end
+    for trace in string.gmatch(errorMsg, "stack traceback:([^s]*)") do
+        table.insert(traces, trace)
+    end
+    
+    d(string.format("[INFO] Found %d stack trace sections", #traces))
+    
+    -- Debug output to see what we're working with
+    for i, trace in ipairs(traces) do
+        d(string.format("[DEBUG] Stack trace %d:", i))
+        d(trace)
+    end
+    
+    -- Verify we have at least one stack trace
+    AssertNotNil(traces[1], "Should have at least one stack trace")
+    
+    -- Check for tail calls in ALL stack traces
+    local hasTailCalls = false
+    for _, trace in ipairs(traces) do
+        if string.find(trace, "%(tail call%):") then
+            hasTailCalls = true
+            break
+        end
+    end
+    AssertEqual(true, hasTailCalls, "At least one stack trace should show tail calls")
+    
+    -- Check for local variables in ALL stack traces
+    local hasLocals = false
+    for _, trace in ipairs(traces) do
+        if string.find(trace, "<Locals>") then
+            hasLocals = true
+            break
+        end
+    end
+    AssertEqual(true, hasLocals, "At least one stack trace should show local variables")
+    
+    -- Use ZO_GetCallstackFunctionNames one last time to verify final state
+    local finalStack = ZO_GetCallstackFunctionNames(0)
+    d("[STACK] Final callstack after error:")
+    for i, funcName in ipairs(finalStack) do
+        d(string.format("  %d: %s", i, funcName))
+    end
     
     -- Verify coroutine is dead after error
     AssertEqual("dead", coroutine.status(co), "Coroutine should be dead after error")
+end
+
+-- Test error formatting and stack trace visualization
+function TestCoroutine.tests.TestErrorFormatting()
+    -- Pretty prints a table with proper indentation and formatting
+    local function prettyPrint(value, indent, done)
+        indent = indent or 0
+        done = done or {}
+
+        -- Handle non-table values
+        if type(value) ~= "table" then
+            if type(value) == "string" then
+                return string.format("%q", value)
+            end
+            return tostring(value)
+        end
+
+        if done[value] then
+            return "<circular reference>"
+        end
+
+        done[value] = true
+        local padding = string.rep("  ", indent)
+        local lines = {}
+
+        -- Sort keys for consistent output
+        local keys = {}
+        for k in pairs(value) do
+            table.insert(keys, k)
+        end
+        table.sort(keys, function (a, b)
+            return tostring(a) < tostring(b)
+        end)
+
+        for _, k in ipairs(keys) do
+            local v = value[k]
+            local entry = padding
+            if type(k) == "number" then
+                entry = entry .. "[" .. k .. "]"
+            else
+                entry = entry .. k
+            end
+            entry = entry .. " = "
+
+            if type(v) == "table" then
+                if next(v) == nil then
+                    entry = entry .. "{}"
+                else
+                    entry = entry .. "{\n" .. prettyPrint(v, indent + 1, done) .. "\n" .. padding .. "}"
+                end
+            else
+                if type(v) == "string" then
+                    entry = entry .. string.format("%q", v)
+                else
+                    entry = entry .. tostring(v)
+                end
+            end
+            table.insert(lines, entry)
+        end
+
+        return table.concat(lines, "\n")
+    end
+
+    -- Formats the error message with proper alignment and colors
+    local function formatMessage(formatStr, reportedKey, key, traceback, functionNames)
+        -- Improved header with count and key
+        local header = string.format("|cFFD700%s|r", string.format(formatStr, reportedKey, key))
+
+        -- Format the call stack with improved colors and indentation
+        local callStackInfo = { "|c5C88DACall stack:|r" }
+        for i, functionName in ipairs(functionNames) do
+            -- Use different colors for different types of functions
+            local color = "|cCCCCCC" -- Default gray
+
+            -- Highlight scene-related functions in light blue
+            if functionName:find("Scene") then
+                color = "|c88CCFF"
+            -- Highlight ZO_ functions in green
+            elseif functionName:find("^ZO_") then
+                color = "|c99EEBB"
+            -- Highlight anonymous functions in orange
+            elseif functionName:find("anonymous") then
+                color = "|cFFCC99"
+            end
+
+            table.insert(callStackInfo, string.format("  %2d. %s%s|r", i, color, functionName))
+        end
+
+        -- Extract locals from traceback if present
+        local locals = traceback:match("<[Ll]ocals>(.+)</[Ll]ocals>")
+        if locals then
+            -- Convert common ESO boolean flags
+            locals = locals:gsub("=%s*F%s*[,}]", "= false%1")
+            locals = locals:gsub("=%s*T%s*[,}]", "= true%1")
+
+            -- Handle array-style tables [table:1]
+            locals = locals:gsub("%[table:(%d+)%]", "{}")
+
+            -- Convert the locals string into a proper table format
+            locals = locals:gsub("=%s*{%s*}", "= {}") -- Handle empty tables
+
+            -- Clean up the locals string to make it valid Lua
+            locals = locals:gsub("=%s*{([^}]+)}", function (content)
+                -- Format table contents properly
+                local cleaned = content:gsub("%s+", " ")        -- Normalize whitespace
+                    :gsub("([%w_]+)%s*=%s*([^,}]+)", "%1 = %2") -- Fix key-value pairs
+                    :gsub(",%s*}", "}")                         -- Remove trailing commas
+                return "= {" .. cleaned .. "}"
+            end)
+
+            -- Add quotes around string keys if needed
+            locals = locals:gsub("([%w_]+)%s*=", function (keyName)
+                -- Don't quote 'self' as it's a special case
+                if keyName == "self" then return keyName .. " =" end
+                return string.format("%q = ", keyName)
+            end)
+
+            local localsFunc, _ = LoadString("return {" .. locals .. "}", "locals")
+            if localsFunc then
+                local success, result = pcall(localsFunc)
+                if success and type(result) == "table" then
+                    locals = "\n|cE6CC80Locals:|r\n" .. prettyPrint(result, 1) .. "\n"
+                    traceback = traceback:gsub("<[Ll]ocals>.+</[Ll]ocals>", locals)
+                end
+            end
+        end
+
+        -- Format traceback for better readability
+        traceback = traceback:gsub("stack traceback:", "|cFF6666Traceback:|r")
+
+        -- Colorize file paths in traceback
+        traceback = traceback:gsub("([%w_/\\%.]+%.lua:%d+:)", "|cAAFFAA%1|r")
+
+        -- Highlight 'in function' parts
+        traceback = traceback:gsub("(in function%s+[%w_:'%.]+)", "|c99DDFF%1|r")
+
+        -- Highlight 'Undefined global' message
+        traceback = traceback:gsub("(|cFF0000Undefined global|r:[^%s]+)", "|cFF5555%1|r")
+
+        -- Ensure consistent line endings and create the final message with better spacing
+        local message = header .. "\n\n" .. traceback .. "\n\n" .. table.concat(callStackInfo, "\n") .. "\n"
+
+        return (message:gsub("\r\n", "\n")) -- Normalize any Windows line endings
+    end
+
+    -- Create a function that will generate a complex error
+    local function generateComplexError()
+        local function innerFunction(data)
+            -- Create a circular reference
+            data.self = data
+            -- Create some nested tables
+            data.nested = {
+                array = {1, 2, 3},
+                table = {key = "value"},
+                empty = {}
+            }
+            -- Force an error with our complex data
+            error(string.format("Complex error with data: %s", prettyPrint(data)))
+        end
+
+        local function outerFunction()
+            local data = {
+                message = "Test error",
+                number = 42,
+                boolean = true,
+                nil_value = nil
+            }
+            return innerFunction(data)
+        end
+
+        return outerFunction()
+    end
+
+    -- Create a coroutine that will generate our complex error
+    local co = coroutine.create(generateComplexError)
+    coroutine.setname(co, "ComplexError")
+
+    -- Run it and capture the error
+    local success, errorMsg = coroutine.resume(co)
+    
+    -- We expect this to fail
+    AssertEqual(false, success, "Coroutine should fail due to error")
+    AssertNotNil(errorMsg, "Error message should not be nil")
+
+    -- Get the callstack
+    local callstack = ZO_GetCallstackFunctionNames(0)
+    
+    -- Format our error message
+    local formattedError = formatMessage(
+        "Error #%d in coroutine %s",
+        1,
+        "ComplexError",
+        errorMsg,
+        callstack
+    )
+
+    -- Debug output to see our beautiful error
+    d("[FORMATTED] Error message:")
+    d(formattedError)
+
+    -- Verify the formatted message contains expected elements
+    AssertEqual(true, string.find(formattedError, "|cFFD700Error #1 in coroutine ComplexError|r") ~= nil,
+        "Formatted message should contain colored header")
+    AssertEqual(true, string.find(formattedError, "|c5C88DACall stack:|r") ~= nil,
+        "Formatted message should contain call stack header")
+    AssertEqual(true, string.find(formattedError, "|cE6CC80Locals:|r") ~= nil,
+        "Formatted message should contain locals section")
+    AssertEqual(true, string.find(formattedError, "|cFF6666Traceback:|r") ~= nil,
+        "Formatted message should contain traceback header")
+
+    -- Verify coroutine is dead after error
+    AssertEqual("dead", coroutine.status(co), "Coroutine should be dead after error")
+end
+
+-- Test different ways of getting tracebacks from coroutines
+function TestCoroutine.tests.TestCoroutineTracebackMethods()
+    -- Create our test coroutine with nested functions to make stack more interesting
+    local function deeperFunction(x)
+        error("boom") -- This will show in both traces
+    end
+    
+    local function middleFunction(x)
+        return deeperFunction(x + 1) -- This should show up in traces
+    end
+    
+    local co = coroutine.create(function() 
+        local x = 42
+        return middleFunction(x) -- Create a deeper stack
+    end)
+    
+    -- Run it and capture error
+    local success, err = coroutine.resume(co)
+    
+    -- We expect this to fail
+    AssertEqual(false, success, "Coroutine should fail")
+    
+    -- Get both traces
+    local regularTrace = debug.traceback(err, 1)
+    local threadTrace = debug.traceback(co, err, 1)
+    
+    -- Output both for comparison
+    d("[COMPARE] Regular vs Thread traceback:")
+    d("Regular:", regularTrace)
+    d("Thread:", threadTrace)
+    
+    -- Verify the thread trace is shorter (more focused)
+    local regularLines = select(2, regularTrace:gsub("\n", "\n"))
+    local threadLines = select(2, threadTrace:gsub("\n", "\n"))
+    AssertEqual(true, threadLines < regularLines, 
+        "Thread-based trace should be more focused (fewer lines)")
+    
+    -- Verify both traces show our local variable
+    AssertEqual(true, regularTrace:find("x = 42") ~= nil, 
+        "Regular trace should show local variable")
+    AssertEqual(true, threadTrace:find("x = 42") ~= nil, 
+        "Thread trace should show local variable")
+    
+    -- Verify thread trace doesn't contain UI stuff
+    AssertEqual(nil, threadTrace:find("ChatSystem"),
+        "Thread trace should not contain UI call stack")
+end
+
+-- Test the cursed behavior of debug.traceback
+function TestCoroutine.tests.TestTracebackCursedBehavior()
+    local function makeError()
+        local x = 42
+        error("boom")
+    end
+
+    local co = coroutine.create(makeError)
+    local success, err = coroutine.resume(co)
+    
+    -- Test 1: Normal usage (should work)
+    local trace1 = debug.traceback()
+    d("[TEST1] Basic traceback:")
+    d(trace1)
+    AssertEqual("string", type(trace1), "Basic traceback should return string")
+    
+    -- Test 2: Message as number
+    local trace2 = debug.traceback(42)
+    d("[TEST2] Number as message:")
+    d(trace2)
+    AssertEqual("string", type(trace2), "Traceback with number message should return string")
+    
+    -- Test 3: The nil trap
+    local trace3 = debug.traceback(nil, 1)
+    d("[TEST3] Nil + level:")
+    d(trace3)
+    d("Type:", type(trace3))
+    
+    -- Test 4: Empty string message
+    local trace4 = debug.traceback("", 1)
+    d("[TEST4] Empty string + level:")
+    d(trace4)
+    AssertEqual("string", type(trace4), "Traceback with empty string should return string")
+    
+    -- Test 5: The ultimate trap
+    local trace5 = debug.traceback(nil, nil, 1)
+    d("[TEST5] Double nil + level:")
+    d(trace5)
+    d("Type:", type(trace5))
+    AssertEqual("number", type(trace5), "The cursed behavior returns the last argument!")
+    
+    -- Test 6: Thread + nil + level (what we actually want)
+    local trace6 = debug.traceback(co, nil, 1)
+    d("[TEST6] Thread + nil + level (correct usage):")
+    d(trace6)
+    AssertEqual("string", type(trace6), "Thread-based traceback should return string")
+    
+    -- Test 7: Just the thread
+    local trace7 = debug.traceback(co)
+    d("[TEST7] Just thread:")
+    d(trace7)
+    AssertEqual("string", type(trace7), "Thread-only traceback should return string")
 end
 
 -- Run all tests
