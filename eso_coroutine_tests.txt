@@ -1,9 +1,10 @@
 ## Title: CoroutineTests
 ## Description: Test suite for ESO's coroutine implementation
-## Author: TARS
+## Author: dack_janiels
 ## Version: 1.0.0
-## APIVersion: 101045
+## APIVersion: 101049 101050
 ## SavedVariables: 
-## DependsOn: 
+## DependsOn: Taneth
 
+coxpcall.lua
 eso_coroutine_tests.lua
